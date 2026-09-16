@@ -1,0 +1,124 @@
+{
+  "template_id": "RA-2026-001",
+  "document_name": "Rent Agreement",
+  "document_type": "rent_agreement",
+  "version": "2026",
+  "template_file": "rent_agreement_2026_template.docx",
+  "aliases": [
+  "rent agreement",
+  "rental agreement",
+  "house rent agreement",
+  "tenant agreement",
+  "lease agreement",
+  "rent contract",
+  "rental contract",
+  "किराया समझौता",
+  "रेंट एग्रीमेंट",
+  "मकान किराया एग्रीमेंट",
+  "rent agreement ka template"
+],
+  "fields": [
+    {
+      "name": "date",
+      "label": "Agreement Date",
+      "type": "date",
+      "required": true
+    },
+    {
+      "name": "landlord_name",
+      "label": "Landlord Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "landlord_address",
+      "label": "Landlord Address",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "tenant_name",
+      "label": "Tenant Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "tenant_address",
+      "label": "Tenant Address",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "property_address",
+      "label": "Rental Property Address",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "start_date",
+      "label": "Start Date",
+      "type": "date",
+      "required": true
+    },
+    {
+      "name": "end_date",
+      "label": "End Date",
+      "type": "date",
+      "required": true
+    },
+    {
+      "name": "monthly_rent",
+      "label": "Monthly Rent",
+      "type": "number",
+      "required": true
+    },
+    {
+      "name": "security_deposit",
+      "label": "Security Deposit",
+      "type": "number",
+      "required": true
+    },
+    {
+      "name": "purpose_of_use",
+      "label": "Purpose of Use",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "utility_responsibility",
+      "label": "Utility Responsibility",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "additional_terms",
+      "label": "Additional Terms",
+      "type": "textarea",
+      "required": false
+    },
+    {
+      "name": "witness1_name",
+      "label": "Witness 1 Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "witness1_address",
+      "label": "Witness 1 Address",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "witness2_name",
+      "label": "Witness 2 Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "witness2_address",
+      "label": "Witness 2 Address",
+      "type": "textarea",
+      "required": true
+    }
+  ]
+}

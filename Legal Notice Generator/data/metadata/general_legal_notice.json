@@ -1,0 +1,96 @@
+{
+  "template_id": "GLN-2026-001",
+  "document_name": "General Legal Notice",
+  "document_type": "legal_notice",
+  "version": "2026",
+  "template_file": "general_legal_notice_2026_template.docx",
+  "aliases": [
+  "general legal notice",
+  "legal notice",
+  "notice template",
+  "lawyer notice",
+  "advocate notice",
+  "legal notice format",
+  "legal notice form",
+  "official legal notice",
+  "कानूनी नोटिस",
+  "लीगल नोटिस",
+  "नोटिस",
+  "vakil notice",
+  "legal notice ka template"
+],
+  "fields": [
+    {
+      "name": "date",
+      "label": "Notice Date",
+      "type": "date",
+      "required": true
+    },
+    {
+      "name": "recipient_name",
+      "label": "Recipient Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "recipient_address",
+      "label": "Recipient Address",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "notice_subject",
+      "label": "Notice Subject",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "sender_name",
+      "label": "Sender/Client Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "sender_address",
+      "label": "Sender Address",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "background_facts",
+      "label": "Background/Facts",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "issue_or_breach",
+      "label": "Issue or Breach",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "previous_action",
+      "label": "Previous Action/Communication",
+      "type": "textarea",
+      "required": false
+    },
+    {
+      "name": "required_action",
+      "label": "Required Action",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "response_period",
+      "label": "Response Period in Days",
+      "type": "number",
+      "required": true
+    },
+    {
+      "name": "contact_details",
+      "label": "Contact Details",
+      "type": "text",
+      "required": false
+    }
+  ]
+}

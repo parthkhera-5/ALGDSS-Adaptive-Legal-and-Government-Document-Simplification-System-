@@ -1,0 +1,89 @@
+{
+  "template_id": "NPD-2026-001",
+  "document_name": "Legal Notice for Non-Payment of Dues",
+  "document_type": "legal_notice_non_payment",
+  "version": "2026",
+  "template_file": "non_payment_notice_2026_template.docx",
+  "aliases": [
+  "legal notice for non payment",
+  "non payment notice",
+  "payment due notice",
+  "dues notice",
+  "recovery notice",
+  "money recovery notice",
+  "outstanding payment notice",
+  "payment reminder legal notice",
+  "बकाया भुगतान नोटिस",
+  "भुगतान वसूली नोटिस",
+  "कर्ज वसूली नोटिस",
+  "non payment notice ka template"
+],
+  "fields": [
+    {
+      "name": "date",
+      "label": "Notice Date",
+      "type": "date",
+      "required": true
+    },
+    {
+      "name": "recipient_name",
+      "label": "Recipient Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "recipient_address",
+      "label": "Recipient Address",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "sender_name",
+      "label": "Sender/Claimant Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "sender_address",
+      "label": "Sender Address",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "transaction_details",
+      "label": "Transaction Details",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "outstanding_amount",
+      "label": "Outstanding Amount",
+      "type": "number",
+      "required": true
+    },
+    {
+      "name": "outstanding_date",
+      "label": "Outstanding As Of Date",
+      "type": "date",
+      "required": true
+    },
+    {
+      "name": "previous_demand_details",
+      "label": "Previous Demand/Communication",
+      "type": "textarea",
+      "required": false
+    },
+    {
+      "name": "payment_period",
+      "label": "Payment Period in Days",
+      "type": "number",
+      "required": true
+    },
+    {
+      "name": "contact_details",
+      "label": "Contact Details",
+      "type": "text",
+      "required": false
+    }
+  ]
+}

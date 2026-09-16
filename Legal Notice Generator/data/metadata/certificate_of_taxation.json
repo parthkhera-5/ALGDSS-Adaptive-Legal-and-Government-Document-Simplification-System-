@@ -1,0 +1,144 @@
+{
+  "template_id": "certificate_of_taxation",
+  "document_name": "Certificate of Taxation",
+  "document_type": "certificate",
+  "version": "2026",
+  "template_file": "certificate_of_taxation_2026_template.docx",
+  "description": "Supreme Court of India Certificate of Taxation (S.C.R., Order L) used to certify the taxation of a bill of costs lodged before the Court.",
+  "jurisdiction": "Supreme Court of India",
+  "aliases": [
+  "certificate of taxation",
+  "taxation certificate",
+  "tax certificate",
+  "bill of costs certificate",
+  "supreme court taxation certificate",
+  "cost taxation certificate",
+  "certificate of taxed costs",
+  "कराधान प्रमाणपत्र",
+  "टैक्स प्रमाणपत्र",
+  "सुप्रीम कोर्ट टैक्सेशन सर्टिफिकेट",
+  "taxation certificate ka template"
+],
+  "fields": [
+    {
+      "name": "appeal_number",
+      "label": "Appeal Number",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "appeal_year",
+      "label": "Appeal Year",
+      "type": "number",
+      "required": true
+    },
+    {
+      "name": "case_title",
+      "label": "Case Title",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "appellant_name",
+      "label": "Appellant Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "plaintiff_name",
+      "label": "Plaintiff Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "plaintiff_state",
+      "label": "Plaintiff State",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "respondent_name",
+      "label": "Respondent Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "defendant_name",
+      "label": "Defendant Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "defendant_state",
+      "label": "Defendant State",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "bill_number",
+      "label": "Bill Number",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "bill_year",
+      "label": "Bill Year",
+      "type": "number",
+      "required": true
+    },
+    {
+      "name": "bill_parties",
+      "label": "Parties to the Bill",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "advocate_name",
+      "label": "Advocate-on-Record Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "represented_party",
+      "label": "Represented Party",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "taxed_amount_figures",
+      "label": "Taxed Amount (Figures)",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "taxed_amount_words",
+      "label": "Taxed Amount (Words)",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "certificate_day",
+      "label": "Certificate Day",
+      "type": "number",
+      "required": true
+    },
+    {
+      "name": "certificate_month",
+      "label": "Certificate Month",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "certificate_year",
+      "label": "Certificate Year",
+      "type": "number",
+      "required": true
+    },
+    {
+      "name": "taxing_officer_name",
+      "label": "Taxing Officer Name",
+      "type": "text",
+      "required": true
+    }
+  ]
+}

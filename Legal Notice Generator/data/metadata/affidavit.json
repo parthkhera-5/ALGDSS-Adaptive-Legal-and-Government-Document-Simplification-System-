@@ -1,0 +1,87 @@
+{
+  "template_id": "AFF-2026-001",
+  "document_name": "Affidavit",
+  "document_type": "affidavit",
+  "version": "2026",
+  "template_file": "affidavit_2026_template.docx",
+  "aliases": [
+  "affidavit",
+  "affidavit template",
+  "affidavit format",
+  "affidavit form",
+  "sworn affidavit",
+  "sworn statement",
+  "oath affidavit",
+  "self declaration affidavit",
+  "हलफनामा",
+  "शपथ पत्र",
+  "शपथपत्र",
+  "एफिडेविट",
+  "affidavit ka template",
+  "halafnama",
+  "shapath patra"
+],
+  "fields": [
+    {
+      "name": "full_name",
+      "label": "Full Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "age",
+      "label": "Age",
+      "type": "number",
+      "required": true
+    },
+    {
+      "name": "gender",
+      "label": "Gender",
+      "type": "select",
+      "options": ["Male", "Female", "Other"],
+      "required": true
+    },
+    {
+      "name": "parent_or_spouse_name",
+      "label": "Father/Mother/Spouse Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "address",
+      "label": "Residential Address",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "city",
+      "label": "City",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "state",
+      "label": "State",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "declaration_statement",
+      "label": "Declaration",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "place",
+      "label": "Place",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "date",
+      "label": "Date",
+      "type": "date",
+      "required": true
+    }
+  ]
+}

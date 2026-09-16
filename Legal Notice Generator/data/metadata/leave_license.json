@@ -1,0 +1,113 @@
+{
+  "template_id": "LLA-2026-001",
+  "document_name": "Leave and License Agreement",
+  "document_type": "leave_and_license",
+  "version": "2026",
+  "template_file": "leave_license_2026_template.docx",
+  "aliases": [
+  "leave and license agreement",
+  "leave license agreement",
+  "leave licence agreement",
+  "license agreement",
+  "licence agreement",
+  "leave and licence",
+  "property license agreement",
+  "occupancy agreement",
+  "लीव एंड लाइसेंस एग्रीमेंट",
+  "लीव लाइसेंस समझौता",
+  "लाइसेंस एग्रीमेंट",
+  "leave licence ka template"
+],
+  "fields": [
+    {
+      "name": "date",
+      "label": "Agreement Date",
+      "type": "date",
+      "required": true
+    },
+    {
+      "name": "licensor_name",
+      "label": "Licensor Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "licensor_address",
+      "label": "Licensor Address",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "licensee_name",
+      "label": "Licensee Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "licensee_address",
+      "label": "Licensee Address",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "property_address",
+      "label": "Licensed Property Address",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "start_date",
+      "label": "Start Date",
+      "type": "date",
+      "required": true
+    },
+    {
+      "name": "end_date",
+      "label": "End Date",
+      "type": "date",
+      "required": true
+    },
+    {
+      "name": "license_fee",
+      "label": "Monthly License Fee",
+      "type": "number",
+      "required": true
+    },
+    {
+      "name": "security_deposit",
+      "label": "Security Deposit",
+      "type": "number",
+      "required": true
+    },
+    {
+      "name": "purpose_of_use",
+      "label": "Purpose of Use",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "maintenance_and_utility_terms",
+      "label": "Maintenance and Utility Terms",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "additional_terms",
+      "label": "Additional Terms",
+      "type": "textarea",
+      "required": false
+    },
+    {
+      "name": "witness1_name",
+      "label": "Witness 1 Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "witness2_name",
+      "label": "Witness 2 Name",
+      "type": "text",
+      "required": true
+    }
+  ]
+}

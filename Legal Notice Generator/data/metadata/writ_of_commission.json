@@ -1,0 +1,159 @@
+{
+  "template_id": "WOC-2026-001",
+  "document_name": "Writ of Commission",
+  "document_type": "writ_of_commission",
+  "version": "2026",
+  "template_file": "writ_of_commission_2026_template.docx",
+  "aliases": [
+  "writ of commission",
+  "commission writ",
+  "court commission writ",
+  "witness examination commission",
+  "interrogatory commission",
+  "viva voce commission",
+  "commission order",
+  "आयोग रिट",
+  "कमीशन रिट",
+  "गवाह जांच आयोग",
+  "writ of commission ka template"
+],
+  "fields": [
+    {
+      "name": "case_number",
+      "label": "Case Number",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "case_year",
+      "label": "Case Year",
+      "type": "number",
+      "required": true
+    },
+    {
+      "name": "plaintiff_state",
+      "label": "Plaintiff State",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "plaintiff_name",
+      "label": "Plaintiff Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "defendant_state",
+      "label": "Defendant State",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "defendant_name",
+      "label": "Defendant Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "appointing_authority_name",
+      "label": "Appointing Authority Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "represented_party",
+      "label": "Represented Party",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "examination_type",
+      "label": "Examination Type",
+      "type": "select",
+      "options": [
+        "Interrogatories",
+        "Viva Voce",
+        "Both"
+      ],
+      "required": true
+    },
+    {
+      "name": "witness_count",
+      "label": "Number of Witnesses",
+      "type": "number",
+      "required": true
+    },
+    {
+      "name": "returnable_date",
+      "label": "Returnable Date",
+      "type": "date",
+      "required": true
+    },
+    {
+      "name": "chief_justice_name",
+      "label": "Chief Justice of India",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "writ_day",
+      "label": "Writ Day",
+      "type": "number",
+      "required": true
+    },
+    {
+      "name": "writ_month",
+      "label": "Writ Month",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "writ_year",
+      "label": "Writ Year",
+      "type": "number",
+      "required": true
+    },
+    {
+      "name": "advocate_on_record_for",
+      "label": "Advocate-on-Record For",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "witness_1",
+      "label": "Witness 1 Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "witness_2",
+      "label": "Witness 2 Name",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "witness_3",
+      "label": "Witness 3 Name",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "witness_4",
+      "label": "Witness 4 Name",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "witness_5",
+      "label": "Witness 5 Name",
+      "type": "text",
+      "required": false
+    },
+    {
+      "name": "interpreter_language",
+      "label": "Interpreter Language",
+      "type": "text",
+      "required": true
+    }
+  ]
+}
