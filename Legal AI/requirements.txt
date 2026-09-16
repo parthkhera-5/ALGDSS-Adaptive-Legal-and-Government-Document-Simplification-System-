@@ -1,0 +1,13 @@
+flask
+python-dotenv
+pymupdf
+python-docx
+sentence-transformers
+faiss-cpu
+groq
+numpy
+torch
+transformers
+huggingface-hub
+deep-translator
+gTTS

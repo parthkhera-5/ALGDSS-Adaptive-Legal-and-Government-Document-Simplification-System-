@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Legal Assistant</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+    <!-- ================================================= -->
+    <!-- SIDEBAR -->
+    <!-- ================================================= -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                ⚖
+            </div>
+
+            <div>
+                <h1>Legal Assistant</h1>
+                <span>AI-powered document analysis</span>
+            </div>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <p class="section-title">
+                Document
+            </p>
+
+            <div
+                class="upload-box"
+                id="uploadBox"
+            >
+
+                <div class="upload-icon">
+                    📄
+                </div>
+
+                <p>
+                    Drop your document here
+                </p>
+
+                <span>
+                    PDF or DOCX
+                </span>
+
+                <button
+                    type="button"
+                    id="chooseFileBtn"
+                >
+                    Choose File
+                </button>
+
+                <input
+                    type="file"
+                    id="fileInput"
+                    accept=".pdf,.docx"
+                    hidden
+                >
+
+            </div>
+
+
+            <div
+                class="document-info hidden"
+                id="documentInfo"
+            >
+
+                <div class="document-icon">
+                    📄
+                </div>
+
+                <div class="document-details">
+
+                    <strong id="fileName">
+                        Document
+                    </strong>
+
+                    <span id="fileStatus">
+                        Processing...
+                    </span>
+
+                </div>
+
+                <button
+                    id="removeFileBtn"
+                    class="remove-btn"
+                    title="Remove document"
+                >
+                    ×
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="status">
+
+                <span
+                    class="status-dot"
+                    id="statusDot"
+                ></span>
+
+                <span id="statusText">
+                    No document loaded
+                </span>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================================================= -->
+    <!-- MAIN -->
+    <!-- ================================================= -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <header class="topbar">
+
+    <div>
+
+        <h2>
+            Legal Document Assistant
+        </h2>
+
+        <p>
+            Analyze, understand and review your legal documents.
+        </p>
+
+    </div>
+
+
+    <!-- LANGUAGE SELECTOR -->
+
+    <div class="language-selector">
+
+        <label for="languageSelect">
+            Language
+        </label>
+
+        <select id="languageSelect">
+
+            <option value="en" selected>
+                English
+            </option>
+
+            <option value="hi">
+                हिंदी
+            </option>
+
+        </select>
+
+    </div>
+
+</header>
+
+
+        <!-- ================================================= -->
+        <!-- CONTENT -->
+        <!-- ================================================= -->
+
+        <section class="content">
+
+            <!-- WELCOME -->
+
+            <div
+                class="welcome"
+                id="welcome"
+            >
+
+                <div class="welcome-icon">
+                    ⚖
+                </div>
+
+                <h2>
+                    How can I help with your document?
+                </h2>
+
+                <p>
+                    Upload a legal document and choose an analysis
+                    type to get started.
+                </p>
+
+            </div>
+
+
+            <!-- OPERATION CARDS -->
+
+            <div class="operations">
+
+                <button
+                    class="operation-card active"
+                    data-operation="DOCUMENT_QA"
+                >
+
+                    <span class="operation-icon">
+                        🔍
+                    </span>
+
+                    <span class="operation-text">
+
+                        <strong>
+                            Ask Question
+                        </strong>
+
+                        <small>
+                            Ask about your document
+                        </small>
+
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="operation-card"
+                    data-operation="SUMMARY"
+                >
+
+                    <span class="operation-icon">
+                        📄
+                    </span>
+
+                    <span class="operation-text">
+
+                        <strong>
+                            Summarize
+                        </strong>
+
+                        <small>
+                            Get a document summary
+                        </small>
+
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="operation-card"
+                    data-operation="RISK_DETECTION"
+                >
+
+                    <span class="operation-icon">
+                        ⚠️
+                    </span>
+
+                    <span class="operation-text">
+
+                        <strong>
+                            Detect Risks
+                        </strong>
+
+                        <small>
+                            Find risky clauses
+                        </small>
+
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="operation-card"
+                    data-operation="CLAUSE_EXPLANATION"
+                >
+
+                    <span class="operation-icon">
+                        📑
+                    </span>
+
+                    <span class="operation-text">
+
+                        <strong>
+                            Explain Clause
+                        </strong>
+
+                        <small>
+                            Understand legal clauses
+                        </small>
+
+                    </span>
+
+                </button>
+
+
+                <button
+                    class="operation-card"
+                    data-operation="LEGAL_VALIDATION"
+                >
+
+                    <span class="operation-icon">
+                        ✓
+                    </span>
+
+                    <span class="operation-text">
+
+                        <strong>
+                            Legal Validation
+                        </strong>
+
+                        <small>
+                            Review legal terms
+                        </small>
+
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <!-- CHAT -->
+
+            <div class="chat-container">
+
+                <div
+                    class="messages"
+                    id="messages"
+                >
+
+                    <!-- Messages will appear here -->
+
+                </div>
+
+
+                <!-- INPUT -->
+
+                <div class="input-area">
+
+                    <textarea
+                        id="queryInput"
+                        placeholder="Ask something about your document..."
+                        rows="1"
+                    ></textarea>
+
+
+                    <!-- MICROPHONE -->
+
+                    <button
+                        id="micBtn"
+                        class="mic-btn"
+                        type="button"
+                        title="Speak"
+                    >
+                        🎤
+                    </button>
+
+
+                    <!-- SEND -->
+
+                    <button
+                        id="sendBtn"
+                        class="send-btn"
+                        title="Analyze"
+                    >
+                        ➤
+                    </button>
+
+                </div>
+                <p class="disclaimer">
+                    AI-generated analysis. Review important legal matters
+                    with a qualified legal professional.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script
+    src="{{ url_for('static', filename='js/script.js') }}"
+></script>
+
+</body>
+
+</html>
