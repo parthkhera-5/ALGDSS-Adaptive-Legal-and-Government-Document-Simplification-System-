@@ -1,0 +1,13 @@
+flask
+python-dotenv
+pandas
+numpy
+faiss-cpu
+sentence-transformers
+langchain-groq
+langchain-core
+mem0ai
+qdrant-client
+ddgs
+beautifulsoup4
+requests
