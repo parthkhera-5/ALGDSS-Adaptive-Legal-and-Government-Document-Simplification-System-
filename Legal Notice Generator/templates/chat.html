@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Legal Document Assistant</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="chat-page">
+
+    <div class="chat-container">
+
+        <!-- HEADER -->
+
+        <div class="chat-header">
+
+            <div>
+                <h1>Legal Document Assistant</h1>
+                <p>Search and generate legal documents</p>
+            </div>
+
+            <div class="chat-actions">
+
+                <button type="button"
+                        class="clear-btn"
+                        onclick="clearChat()">
+                    Clear Chat
+                </button>
+
+                <button type="button"
+                        class="new-chat-btn"
+                        onclick="startNewChat()">
+                    New Chat
+                </button>
+
+                <a href="/" class="home-btn">
+                    Home
+                </a>
+
+            </div>
+
+        </div>
+
+        <!-- CHAT -->
+
+        <div id="chat">
+
+            <div class="message bot-message">
+
+                <strong>Hello! I am your Legal Document Assistant.</strong>
+
+                <br><br>
+
+                I can help you find legal document templates from the knowledge base.
+
+                <br><br>
+
+                You can ask me for:
+
+                <ul>
+                    <li>Affidavit</li>
+                    <li>General Legal Notice</li>
+                    <li>Leave and License Agreement</li>
+                    <li>Non-Payment Notice</li>
+                    <li>Rent Agreement</li>
+                </ul>
+
+            </div>
+
+        </div>
+<div class="language-selector">
+
+    <label for="language">Language:</label>
+
+    <select id="language">
+
+        <option value="en" selected>English</option>
+
+        <option value="hi">हिन्दी</option>
+
+    </select>
+
+</div>
+        <!-- INPUT -->
+
+        <div class="chat-input-area">
+
+            <row gap=2 align=center>
+    <button
+        type="button"
+        id="micBtn"
+        onclick="startRecording()">
+        🎤 Start
+    </button>
+
+    <button
+        type="button"
+        id="stopBtn"
+        onclick="stopRecording()"
+        disabled>
+        ⏹ Stop
+    </button>
+</row>
+
+            <input type="text"
+                   id="question"
+                   placeholder="Ask for a legal document..."
+                   autocomplete="off">
+
+            <button type="button"
+                    id="sendBtn"
+                    onclick="sendQuestion()">
+                Send
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Load chat.js FIRST -->
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+
+<!-- Load voice.js SECOND -->
+<script src="{{ url_for('static', filename='js/voice.js') }}"></script>
+
+</body>
+
+</html>

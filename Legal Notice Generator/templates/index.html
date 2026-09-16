@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        ALGDSS - Legal Document Generator
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+<body>
+
+    <div class="navbar">
+
+        <h2>
+            ALGDSS
+        </h2>
+
+    </div>
+
+
+    <div class="container">
+
+        <div class="card home-card">
+
+            <h1>
+                Legal Document Assistant
+            </h1>
+
+            <p>
+                Search legal document templates using
+                an AI-powered RAG system.
+            </p>
+
+            <p>
+                You can download a blank document or
+                fill the required information before
+                downloading it.
+            </p>
+
+            <!-- <a href="/chat"> -->
+<a href="{{ url_for('chatbot.chat_page') }}">
+                <button
+                    type="button"
+                    class="primary-btn"
+                >
+                    Start Chat
+                </button>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

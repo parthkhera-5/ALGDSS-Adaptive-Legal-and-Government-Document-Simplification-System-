@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Fill Legal Document
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+<body>
+
+    <div class="navbar">
+
+        <h2>
+            Legal Document Generator
+        </h2>
+
+        <!-- <a href="/"> -->
+<a href="{{ url_for('index') }}">
+            <button
+                type="button"
+                class="secondary-btn"
+            >
+                Home
+            </button>
+
+        </a>
+
+    </div>
+
+
+    <div class="container">
+
+        <div class="card form-card">
+
+            <div class="form-header">
+
+                <h2 id="documentTitle">
+                    Fill Legal Document
+                </h2>
+
+                <p>
+                    Enter only the information required
+                    for this particular document.
+                </p>
+
+            </div>
+
+
+            <form id="documentForm">
+
+                <input
+                    type="hidden"
+                    id="templateId"
+                    name="template_id"
+                >
+
+
+                <div id="dynamicForm">
+
+                    <div class="loading">
+                        Loading fields...
+                    </div>
+
+                </div>
+
+
+                <div class="form-actions">
+
+    <button
+        type="button"
+        id="generateBtn"
+        class="primary-btn"
+        onclick="submitForm()"
+    >
+        Generate Document
+    </button>
+
+    <button
+        type="button"
+        class="secondary-btn"
+        onclick="downloadBlankDocument()"
+    >
+        Download Blank Template
+    </button>
+
+    <a href="/chat">
+
+        <button
+            type="button"
+            class="secondary-btn"
+        >
+            Back to Chat
+        </button>
+
+    </a>
+
+</div>
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <script
+        src="{{ url_for('static', filename='js/form.js') }}"
+    ></script>
+
+
+    <script>
+
+        const templateId =
+            "{{ template_id }}";
+
+        loadForm(templateId);
+
+    </script>
+
+</body>
+
+</html>
