@@ -418,6 +418,11 @@ def _make_short_description(details, max_len=140):
 
 
 def _row_to_summary(row, lang="en"):
+    """Build one scheme summary. Translation is intentionally optional here.
+
+    The list endpoint translates an entire page in ONE batch rather than calling
+    the LLM once per card. This is the main latency fix for the Schemes tab.
+    """
     category = str(row.get("schemeCategory", "") or "").strip()
     level_val = row.get(_LEVEL_COL) if _LEVEL_COL else None
     name = str(row["scheme_name"])
@@ -425,9 +430,9 @@ def _row_to_summary(row, lang="en"):
     short_desc = _make_short_description(row.get("details", ""))
 
     if lang and lang != "en":
-        translated = translate_strings([name, category, short_desc, level_str], lang)
-        name, category, short_desc = translated[0], translated[1], translated[2]
-        level_str = translated[3]
+        name, category, short_desc, level_str = translate_strings(
+            [name, category, short_desc, level_str], lang
+        )
 
     return {
         "slug": str(row["slug"]),
@@ -439,27 +444,62 @@ def _row_to_summary(row, lang="en"):
     }
 
 
+def _row_to_summary_raw(row):
+    """Same summary fields as _row_to_summary, but NEVER calls the LLM."""
+    category = str(row.get("schemeCategory", "") or "").strip()
+    level_val = row.get(_LEVEL_COL) if _LEVEL_COL else None
+    return {
+        "slug": str(row["slug"]),
+        "name": str(row["scheme_name"]),
+        "category": category,
+        "level": str(level_val).strip() if _LEVEL_COL and pd.notna(level_val) else "",
+        "short_description": _make_short_description(row.get("details", "")),
+        "tags": str(row.get("tags", "") or ""),
+    }
+
+
+def _translate_scheme_summaries(summaries, lang):
+    """Translate all visible card fields in one/few batched LLM calls."""
+    if not summaries or not lang or lang == "en":
+        return summaries
+
+    flat = []
+    for s in summaries:
+        flat.extend([s["name"], s["category"], s["short_description"], s["level"]])
+
+    translated = translate_strings(flat, lang)
+    cursor = 0
+    for s in summaries:
+        s["name"], s["category"], s["short_description"], s["level"] = translated[cursor:cursor + 4]
+        cursor += 4
+    return summaries
+
+
 def _row_to_detail(row, lang="en"):
-    """Full profile for the scheme-details modal -- same underlying fields
-    used to build the RAG chunks, so this always matches what the chatbot
-    itself would cite (before translation is layered on)."""
+    """Full scheme profile. All nine display strings are translated in ONE
+    request, instead of doing a summary request followed by a detail request."""
     link_val = row.get(_LINK_COL) if _LINK_COL else None
-    detail = _row_to_summary(row, lang=lang)
+    detail = _row_to_summary_raw(row)
 
-    details_text = str(row.get("details", "") or "")
-    eligibility_text = str(row.get("eligibility", "") or "")
-    benefits_text = str(row.get("benefits", "") or "")
-    application_text = str(row.get("application", "") or "")
-    documents_text = str(row.get("documents", "") or "")
-
+    values = [
+        detail["name"], detail["category"], detail["short_description"], detail["level"],
+        str(row.get("details", "") or ""),
+        str(row.get("eligibility", "") or ""),
+        str(row.get("benefits", "") or ""),
+        str(row.get("application", "") or ""),
+        str(row.get("documents", "") or ""),
+    ]
     if lang and lang != "en":
-        translated = translate_strings(
-            [details_text, eligibility_text, benefits_text, application_text, documents_text],
-            lang,
-        )
-        details_text, eligibility_text, benefits_text, application_text, documents_text = translated
+        values = translate_strings(values, lang)
+
+    (name, category, short_desc, level_str, details_text, eligibility_text,
+     benefits_text, application_text, documents_text) = values
 
     detail.update({
+        "name": name,
+        "category": category,
+        "short_description": short_desc,
+        "level": level_str or None,
         "details": details_text,
         "eligibility": eligibility_text,
         "benefits": benefits_text,
@@ -1138,6 +1178,8 @@ UI_STRINGS_EN = {
     "schemes_filter_saved": "♡ Saved",
     "schemes_empty_default": "No schemes found. Try a different search or filter.",
     "schemes_empty_saved": "No saved schemes yet. Tap ♡ on a scheme to save it.",
+    "schemes_load_more": "Load more schemes",
+    "schemes_loading_more": "Loading…",
     "finder_intro_title": "Find Schemes for Me",
     "finder_intro_body": (
         "Tell us a bit about yourself and our matching engine will rank government schemes "
@@ -1761,51 +1803,49 @@ def home():
 
 @app.route("/api/schemes", methods=["GET"])
 def api_schemes_list():
-    """Plain browse/search/filter over the dataset -- powers the Schemes tab
-    grid. Query params:
-      - search: matches against scheme name, category, and tags (substring,
-        case-insensitive). NOTE: matching is always done against the
-        underlying ENGLISH dataset text regardless of `lang`, since the
-        dataset itself is English -- only the returned display strings are
-        translated. If you want search-in-translated-text too, translate
-        `search` back to English first the same way api_chat() does for
-        chat queries.
-      - category: exact category match (case-insensitive); omit or "all" for no filter
-      - lang: language code for the returned scheme names/categories/descriptions
-        (see SUPPORTED_LANGUAGES); defaults to English.
+    """Fast paginated Schemes-tab endpoint.
 
-    NOTE ON TOKEN USAGE: with no search/category filter applied, this
-    translates every scheme in the dataset the first time a given language
-    is requested (subsequent requests reuse _translation_cache and cost
-    nothing). If your dataset is large and you want the *very first* load
-    in each language to be fast too, consider adding a `limit`/`offset`
-    (pagination) here and only translating the page actually shown -- the
-    frontend would need a matching change to request pages instead of the
-    full list.
+    Only the visible page is translated. Previously every matching scheme was
+    translated and each row could trigger its own LLM call, which made the first
+    Hindi/regional-language load very slow.
     """
     search = (request.args.get("search") or "").strip().lower()
     category = (request.args.get("category") or "").strip().lower()
     lang = _normalize_lang(request.args.get("lang"))
 
-    results = []
+    try:
+        limit = max(1, min(int(request.args.get("limit", 12)), 50))
+    except (TypeError, ValueError):
+        limit = 12
+    try:
+        offset = max(0, int(request.args.get("offset", 0)))
+    except (TypeError, ValueError):
+        offset = 0
+
+    matched_rows = []
     for _, row in df.iterrows():
         row_category = str(row.get("schemeCategory", "") or "").strip()
-
         if category and category != "all" and row_category.lower() != category:
             continue
-
         if search:
             haystack = " ".join([
-                str(row.get("scheme_name", "")),
-                row_category,
-                str(row.get("tags", "")),
+                str(row.get("scheme_name", "")), row_category, str(row.get("tags", ""))
             ]).lower()
             if search not in haystack:
                 continue
+        matched_rows.append(row)
 
-        results.append(_row_to_summary(row, lang=lang))
+    page_rows = matched_rows[offset:offset + limit]
+    summaries = [_row_to_summary_raw(row) for row in page_rows]
+    _translate_scheme_summaries(summaries, lang)
 
-    return jsonify({"schemes": results})
+    return jsonify({
+        "schemes": summaries,
+        "offset": offset,
+        "limit": limit,
+        "total": len(matched_rows),
+        "has_more": offset + len(page_rows) < len(matched_rows),
+    })
 
 
 @app.route("/api/schemes/categories", methods=["GET"])
