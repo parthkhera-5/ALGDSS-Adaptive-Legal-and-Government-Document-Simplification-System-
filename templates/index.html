@@ -818,6 +818,19 @@
   .bookmark-btn.saved{ color: var(--secondary); }
   .bookmark-btn.pop{ animation: popIn .4s cubic-bezier(.34,1.56,.64,1) both; }
 
+  .schemes-load-more{
+    margin:0 16px 14px;
+    width:calc(100% - 32px);
+    padding:11px 14px;
+    border:1px solid var(--border);
+    border-radius:999px;
+    background:var(--neutral-0);
+    color:var(--ink);
+    font:700 13px/1.2 inherit;
+    cursor:pointer;
+  }
+  .schemes-load-more:hover{ border-color:var(--primary); color:var(--primary); }
+
   .schemes-empty{
     display:none;
     flex-direction:column;
@@ -1281,6 +1294,7 @@
       </div>
       <div class="category-chips" id="category-chips"></div>
       <div class="schemes-grid" id="schemes-grid"></div>
+      <button type="button" id="schemes-load-more" class="schemes-load-more" hidden>Load more schemes</button>
       <div class="schemes-empty" id="schemes-empty">
         <span class="schemes-empty-icon">🗂️</span>
         <p id="schemes-empty-text">No schemes found. Try a different search or filter.</p>
@@ -1637,7 +1651,10 @@
     // language actually shows up instead of stale English (or a previous
     // language's) text sticking around on tabs that aren't re-fetched from
     // scratch on every view.
-    allSchemesCache = null;
+    allSchemesCache = [];
+    schemesOffset = 0;
+    schemesHasMore = false;
+    schemesLoadMoreBtn.hidden = true;
     Object.keys(detailCache).forEach(k => delete detailCache[k]);
     schemesLoaded = false;
 
@@ -1645,7 +1662,7 @@
 
     if (views.schemes.classList.contains("active")) {
       loadCategories();
-      fetchAndRenderSchemes();
+      fetchAndRenderSchemes(false);
     }
     if (views.profile.classList.contains("active")) {
       renderProfile();
@@ -1888,13 +1905,17 @@
   const schemesEmptyText = document.getElementById("schemes-empty-text");
   const allSavedToggle = document.getElementById("all-saved-toggle");
 
-  let allSchemesCache = null;   // full unfiltered list from the API, in the current language
+  let allSchemesCache = [];      // only the currently loaded pages
   let schemesLoaded = false;
   let activeCategory = "all";
   let activeSavedFilter = "all"; // "all" | "saved"
   let searchDebounceTimer;
-  let schemesRequestToken = 0;   // guards fetchAndRenderSchemes against out-of-order responses
-  let categoriesRequestToken = 0; // guards loadCategories against out-of-order responses
+  let schemesRequestToken = 0;
+  let categoriesRequestToken = 0;
+  let schemesOffset = 0;
+  let schemesHasMore = false;
+  const SCHEMES_PAGE_SIZE = 12;
+  const schemesLoadMoreBtn = document.getElementById("schemes-load-more");
 
   function getBookmarks() {
     try {
@@ -1924,7 +1945,7 @@
     if (schemesLoaded) return;
     schemesLoaded = true;
     await loadCategories();
-    await fetchAndRenderSchemes();
+    await fetchAndRenderSchemes(false);
   }
 
   async function loadCategories() {
@@ -1932,13 +1953,9 @@
     try {
       const res = await fetch("/api/schemes/categories?lang=" + encodeURIComponent(selectedLanguage));
       const data = await res.json();
-      if (myToken !== categoriesRequestToken) return; // a newer language switch already superseded this
-      const categories = data.categories || []; // now [{ value, label }, ...]
+      if (myToken !== categoriesRequestToken) return;
+      const categories = data.categories || [];
       categoryChipsEl.innerHTML = "";
-      // Re-mark whichever chip matches the CURRENT activeCategory as active
-      // (instead of always hardcoding "All" as active), so a previously
-      // selected filter survives a language switch correctly instead of
-      // looking active/inactive out of sync with what's actually being sent.
       const allChip = makeChip(uiStrings.schemes_filter_all || "All", "all", activeCategory === "all");
       categoryChipsEl.appendChild(allChip);
       categories.forEach(cat => {
@@ -1948,7 +1965,7 @@
       if (myToken !== categoriesRequestToken) return;
       console.error("Failed to load categories:", err);
     }
-}
+  }
 
   function makeChip(label, value, isActive) {
     const chip = document.createElement("button");
@@ -1960,7 +1977,7 @@
     chip.addEventListener("click", () => {
       activeCategory = value;
       categoryChipsEl.querySelectorAll(".chip").forEach(c => c.classList.toggle("active", c.dataset.value === value));
-      fetchAndRenderSchemes();
+      fetchAndRenderSchemes(false);
     });
     return chip;
   }
@@ -1969,35 +1986,61 @@
     btn.addEventListener("click", () => {
       activeSavedFilter = btn.dataset.filter;
       allSavedToggle.querySelectorAll(".segmented-btn").forEach(b => b.classList.toggle("active", b === btn));
-      renderSchemeList(allSchemesCache || []);
+      renderSchemeList(allSchemesCache);
     });
   });
 
   schemeSearchInput.addEventListener("input", () => {
     clearTimeout(searchDebounceTimer);
-    searchDebounceTimer = setTimeout(fetchAndRenderSchemes, 280);
+    searchDebounceTimer = setTimeout(() => fetchAndRenderSchemes(false), 280);
   });
 
-  async function fetchAndRenderSchemes() {
+  schemesLoadMoreBtn.addEventListener("click", () => fetchAndRenderSchemes(true));
+
+  async function fetchAndRenderSchemes(append = false) {
     const myToken = ++schemesRequestToken;
+    const offset = append ? schemesOffset : 0;
     const params = new URLSearchParams();
     const q = schemeSearchInput.value.trim();
     if (q) params.set("search", q);
     if (activeCategory && activeCategory !== "all") params.set("category", activeCategory);
     params.set("lang", selectedLanguage);
+    params.set("limit", String(SCHEMES_PAGE_SIZE));
+    params.set("offset", String(offset));
+
+    if (append) {
+      schemesLoadMoreBtn.disabled = true;
+      schemesLoadMoreBtn.textContent = uiStrings.schemes_loading_more || "Loading…";
+    }
 
     try {
       const res = await fetch("/api/schemes?" + params.toString());
+      if (!res.ok) throw new Error("Failed to load schemes");
       const data = await res.json();
-      if (myToken !== schemesRequestToken) return; // a newer search/filter/language change already superseded this
-      allSchemesCache = data.schemes || [];
+      if (myToken !== schemesRequestToken) return;
+
+      const incoming = data.schemes || [];
+      if (append) {
+        allSchemesCache = allSchemesCache.concat(incoming);
+      } else {
+        allSchemesCache = incoming;
+      }
+      schemesOffset = offset + incoming.length;
+      schemesHasMore = !!data.has_more;
       renderSchemeList(allSchemesCache);
+      schemesLoadMoreBtn.hidden = !schemesHasMore;
+      schemesLoadMoreBtn.disabled = false;
+      schemesLoadMoreBtn.textContent = uiStrings.schemes_load_more || "Load more schemes";
     } catch (err) {
       if (myToken !== schemesRequestToken) return;
       console.error("Failed to load schemes:", err);
-      schemesGrid.innerHTML = "";
-      schemesEmptyText.textContent = uiStrings.snackbar_load_error || "Couldn't load schemes right now. Please try again.";
-      schemesEmptyEl.classList.add("show");
+      if (!append) {
+        schemesGrid.innerHTML = "";
+        schemesEmptyText.textContent = uiStrings.snackbar_load_error || "Couldn't load schemes right now. Please try again.";
+        schemesEmptyEl.classList.add("show");
+      }
+      schemesLoadMoreBtn.disabled = false;
+      schemesLoadMoreBtn.textContent = uiStrings.schemes_load_more || "Load more schemes";
     }
   }
 
@@ -2014,13 +2057,11 @@
         ? (uiStrings.schemes_empty_saved || "No saved schemes yet. Tap ♡ on a scheme to save it.")
         : (uiStrings.schemes_empty_default || "No schemes found. Try a different search or filter.");
       schemesEmptyEl.classList.add("show");
+      schemesLoadMoreBtn.hidden = true;
       return;
     }
     schemesEmptyEl.classList.remove("show");
-
-    toShow.forEach((scheme, idx) => {
-      schemesGrid.appendChild(renderBrowseCard(scheme, idx));
-    });
+    toShow.forEach((scheme, idx) => schemesGrid.appendChild(renderBrowseCard(scheme, idx)));
   }
 
   function renderBrowseCard(scheme, idx) {
@@ -2345,22 +2386,22 @@
     }
     profileEmptyNoteEl.classList.remove("show");
 
-    // Reuse the cached full scheme list (in the current language) if we
-    // have it; otherwise fetch fresh in the current language -- same
-    // /api/schemes endpoint the Schemes page uses.
-    let source = allSchemesCache;
-    if (!source) {
-      try {
-        const res = await fetch("/api/schemes?lang=" + encodeURIComponent(selectedLanguage));
-        const data = await res.json();
-        if (myToken !== profileRequestToken) return; // a newer profile render already superseded this
-        source = data.schemes || [];
-      } catch {
-        if (myToken !== profileRequestToken) return;
-        source = [];
-      }
+    const bySlug = Object.fromEntries((allSchemesCache || []).map(s => [s.slug, s]));
+
+    // Saved schemes that are not in the currently loaded 12-card page are
+    // resolved from the lightweight detail endpoint. Requests run in parallel.
+    const missing = marks.filter(slug => !bySlug[slug]);
+    if (missing.length) {
+      const details = await Promise.all(missing.map(async slug => {
+        try {
+          const res = await fetch("/api/schemes/" + encodeURIComponent(slug) + "?lang=" + encodeURIComponent(selectedLanguage));
+          if (!res.ok) return null;
+          return await res.json();
+        } catch { return null; }
+      }));
+      details.filter(Boolean).forEach(s => { bySlug[s.slug] = s; });
+      if (myToken !== profileRequestToken) return;
     }
-    const bySlug = Object.fromEntries(source.map(s => [s.slug, s]));
 
     marks.forEach(slug => {
       const scheme = bySlug[slug];
