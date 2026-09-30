@@ -1,87 +1,102 @@
 ```mermaid
-graph TD
-    %% Section 3.2.1: Document Pre-processing
-    subgraph S1["3.2.1 Document Pre-processing"]
-        A[User Uploads PDF / DOCX / TXT via Flask Interface] --> B[Store File Temporarily & Extract Text + Page Details]
-        B --> C[Split Text into Chunks with Page Context]
-        C --> D{Is Document Small?}
-        D -- Yes --> E[Use Full File Directly]
-        D -- No --> F[Embed Chunks using BAAI/bge-en-v1.5]
-        F --> G[Index Chunks in FAISS Vector Store]
-    end
+flowchart TD
+    classDef startEnd fill:#2E7D32,color:#fff,stroke:#1B5E20,stroke-width:2px;
+    classDef decision fill:#EF6C00,color:#fff,stroke:#E65100,stroke-width:2px;
+    classDef process fill:#1565C0,color:#fff,stroke:#0D47A1,stroke-width:1px;
+    classDef llmNode fill:#7B1FA2,color:#fff,stroke:#4A148C,stroke-width:2px;
 
-    %% Section 3.2.2: Language Processing
-    subgraph S2["3.2.2 Language Processing"]
-        H[User Sends Text/Voice Query in EN or HI] --> I{Is Language Hindi?}
-        I -- Yes --> J[Translate Query to English]
-        I -- No --> K[Keep English Query]
-        J --> L[Query Expansion: Generate 3 Alternate Queries]
-        K --> L
-    end
-
-    %% Section 3.2.3: Intelligent Query Routing
-    subgraph S3["3.2.3 Intelligent Query Routing"]
-        L --> M[Intelligent Router Component]
-        M -->|Route Selected| N{Select Information Route}
-    end
-
-    %% Section 3.2.4: Document Retrieval
-    subgraph S4["3.2.4 Document Retrieval"]
-        N -->|Document Route| O[Search FAISS Document Index using Original + Expanded Queries]
-        E -.->|Context Access| O
-        G -.->|Vector Search| O
-        O --> P[Retrieve Target Sections + Surrounding Context]
-        P --> Q[Re-rank with ms-marco-MiniLM-L-6-v2 Cross-Encoder]
-        Q --> R[Deduplicate & Filter Unrelated Passages]
-    end
-
-    %% Section 3.2.5: Legal Knowledge Retrieval
-    subgraph S5["3.2.5 Legal Knowledge Retrieval"]
-        N -->|Knowledge Route| S[Search FAISS Legal Knowledge Repository]
-        S --> T[Select Top Relevant Legal Passages]
-    end
-
-    %% Section 3.2.6: Combined Retrieval
-    subgraph S6["3.2.6 Combined Retrieval & Context Selection"]
-        N -->|Both Routes| U[Trigger Document & Knowledge Searches Simultaneously]
-        R --> V[Merge Document & Knowledge Contexts]
-        T --> V
-        U --> V
-        V --> W[Context Filter & Relevance Validation]
-    end
-
-    %% Aligning outputs from single routes
-    R --> W
-    T --> W
-
-    %% Section 3.2.7: Prompt Construction
-    subgraph S7["3.2.7 Operation-Based Prompt Construction"]
-        W --> X[Build Task-Specific Prompt]
-        X --- X1["Tasks: QA / Clause Explanation / Summarization / Fact Validation / Risk Spotting"]
-    end
-
-    %% Section 3.2.8: LLM-Based Response Generation
-    subgraph S8["3.2.8 LLM-Based Response Generation"]
-        X --> Y[Send Prompt + Final Context to openai/gpt-oss-120b]
-        Y --> Z[Generate Structured JSON Response]
-    end
-
-    %% Section 3.2.9: Response and Interaction
-    subgraph S9["3.2.9 Response and Interaction"]
-        Z --> AA{Is Selected Output Language Hindi?}
-        AA -- Yes --> AB[Translate JSON Content to Hindi]
-        AA -- No --> AC[Retain English Response]
-        AB --> AD[Display Answer on Flask Frontend]
-        AC --> AD
-        AD --> AE[Synthesize Audio via Text-to-Speech]
-        AD --> AF[Update Conversation Memory]
-    end
-
-    %% Styling / Aesthetics
-    classDef primary fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#fff;
-    classDef process fill:#0f172a,stroke:#475569,stroke-width:1px,color:#e2e8f0;
-    classDef decision fill:#312e81,stroke:#6366f1,stroke-width:1px,color:#fff;
+    %% STAGE 1: FRONTEND & INPUT PIPELINE
+    START([START: User Access via Flask Interface]) :::startEnd
+    START --> InputType{Input Type?} :::decision
     
-    class M,Y primary;
-    class D,I,N,AA decision;
+    InputType -->|Voice| STT[Speech-to-Text STT] :::process
+    InputType -->|Text| DirectText[Direct Text Processing] :::process
+    
+    STT --> LangCheck{Select Language} :::decision
+    DirectText --> LangCheck
+    
+    LangCheck -->|Hindi| TransIn[Translate Hindi to English] :::process
+    LangCheck -->|English| NormText[Normalize & Clean Text RapidFuzz] :::process
+    TransIn --> NormText
+
+    %% STAGE 2: MODULE SELECTION
+    NormText --> SelectModule{Select Module} :::decision
+
+    %% MODULE 1: LEGAL AI
+    SelectModule -->|Module 1: Legal AI| UploadDoc[Upload Document PDF/DOCX/TXT] :::process
+    UploadDoc --> DocSize{Document Size?} :::decision
+    DocSize -->|Large| EmbedDoc[Embed BAAI/bge-en-v1.5 & Index FAISS] :::process
+    DocSize -->|Small| FullText[Extract Full Raw Context] :::process
+    
+    EmbedDoc --> QueryExp[Query Expansion: 3 Alternate Queries] :::process
+    FullText --> QueryExp
+    
+    QueryExp --> RouteCheck{Determine Route} :::decision
+    RouteCheck -->|DOCUMENT| DocSearch[Search Uploaded Document FAISS] :::process
+    RouteCheck -->|KNOWLEDGE| LegalSearch[Search Legal Knowledge FAISS] :::process
+    RouteCheck -->|BOTH| BothSearch[Search Doc + Legal Knowledge FAISS] :::process
+
+    DocSearch --> Rerank[Cross-Encoder Reranking ms-marco-MiniLM-L-6-v2] :::process
+    LegalSearch --> Rerank
+    BothSearch --> Rerank
+
+    Rerank --> FilterCtx[Context Selection & Filtering] :::process
+    FilterCtx --> ConstructPrompt[Build Task-Specific Prompt] :::process
+
+    %% MODULE 2: LEGAL NOTICE GENERATOR
+    SelectModule -->|Module 2: Legal Notice Generator| SearchTmpl[Embed Query BAAI/bge-small-en-v1.5] :::process
+    SearchTmpl --> ChromaSearch[Semantic Search ChromaDB Templates] :::process
+    ChromaSearch --> TmplThresh{Template Found above Threshold?} :::decision
+    
+    TmplThresh -->|NO| NoTmpl[Return Document Not Available Message] :::process
+    NoTmpl --> END([END]) :::startEnd
+
+    TmplThresh -->|YES| ModeCheck{Select Action} :::decision
+    ModeCheck -->|Download Blank| BlankDoc[Replace Placeholders with Blank & Save DOCX] :::process
+    BlankDoc --> DownloadDirect[Download Blank Template] :::process
+    DownloadDirect --> END
+
+    ModeCheck -->|Fill & Download| DynamicForm[Display Dynamic Form & Collect Details] :::process
+    DynamicForm --> FillDoc[Generate Filled DOCX Document] :::process
+    FillDoc --> GroundedPrompt[Build Prompt Grounded in Template Data] :::process
+
+    %% MODULE 3: GOVERNMENT SCHEME RECOMMENDATION
+    SelectModule -->|Module 3: Govt Scheme| IntentHistory[Parse Intent & Fetch History Mem0/Qdrant] :::process
+    IntentHistory --> SchemeEmbed[Embed Query BAAI/bge-en-v1.5] :::process
+    SchemeEmbed --> SchemeFAISS[Search Scheme FAISS Vector DB] :::process
+    SchemeFAISS --> ConfCheck{Similarity Score >= Threshold?} :::decision
+    
+    ConfCheck -->|NO| WebSearch[Web Search Official Govt Sites & Scrape] :::process
+    ConfCheck -->|YES| LocalMatch[Extract Scheme Chunks] :::process
+
+    WebSearch --> UserDemographics[Collect Demographic Profile Data] :::process
+    LocalMatch --> UserDemographics
+
+    UserDemographics --> RuleMatrix[Apply Rule-Based Eligibility Filter Matrix] :::process
+    RuleMatrix --> PriorityRank[Score & Rank Schemes Home State First] :::process
+    PriorityRank --> SchemePrompt[Build Prompt with Profile + Ranked Schemes] :::process
+
+    %% STAGE 3: SHARED CENTRAL LLM ENGINE
+    ConstructPrompt --> UnifiedLLM[Central LLM Engine: openai/gpt-oss-120b] :::llmNode
+    GroundedPrompt --> UnifiedLLM
+    SchemePrompt --> UnifiedLLM
+
+    %% STAGE 4: OUTPUT & INTERACTION LAYER
+    UnifiedLLM --> JSONResp[Generate Response in JSON Format] :::process
+    JSONResp --> TargetLang{User Target Language?} :::decision
+    
+    TargetLang -->|Hindi| TransOut[Translate Response to Hindi] :::process
+    TargetLang -->|English| RenderUI[Render Response on Flask Interface] :::process
+    TransOut --> RenderUI
+
+    RenderUI --> VoiceOut{Voice Output Enabled?} :::decision
+    VoiceOut -->|YES| TTS[Execute Text-to-Speech TTS] :::process
+    VoiceOut -->|NO| SaveMem[Update Conversation Memory Mem0/Qdrant] :::process
+    TTS --> SaveMem
+
+    SaveMem --> Continue{Start New Request?} :::decision
+    Continue -->|YES| SelectModule
+    Continue -->|NO| END
 ```
+
+
